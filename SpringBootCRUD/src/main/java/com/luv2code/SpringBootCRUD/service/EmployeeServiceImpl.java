@@ -1,51 +1,58 @@
 package com.luv2code.SpringBootCRUD.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.luv2code.SpringBootCRUD.dao.EmployeeDAO;
+import com.luv2code.SpringBootCRUD.dao.EmployeeRepositorySpringJpa;
 import com.luv2code.SpringBootCRUD.entity.Employee;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-	private EmployeeDAO employeeDAO;
+	private EmployeeRepositorySpringJpa employeeRepositorySpringJpa;
 
 	@Autowired
-	public EmployeeServiceImpl(@Qualifier("employeeDAOJPAImpl") EmployeeDAO employeeDAO) {
-		this.employeeDAO = employeeDAO;
+	public EmployeeServiceImpl(EmployeeRepositorySpringJpa employeeRepositorySpringJpa) {
+		this.employeeRepositorySpringJpa = employeeRepositorySpringJpa;
 	}
 
 	@Override
-	@Transactional
+
 	public List<Employee> getALl() {
 
-		return employeeDAO.getALl();
+		return employeeRepositorySpringJpa.findAll();
 	}
 
 	@Override
-	@Transactional
+
 	public Employee getById(int theId) {
 
-		return employeeDAO.getById(theId);
+		Optional<Employee> result = employeeRepositorySpringJpa.findById(theId);
+		Employee theEmployee = null;
+		if (result.isPresent()) {
+			theEmployee = result.get();
+		} else {
+			throw new RuntimeException("EMployee is not found of ID : " + theId);
+		}
+		return theEmployee;
 	}
 
 	@Override
-	@Transactional
+
 	public void saveEmployee(Employee theEmployee) {
 
-		employeeDAO.saveEmployee(theEmployee);
+		employeeRepositorySpringJpa.save(theEmployee);
 	}
 
 	@Override
-	@Transactional
+
 	public void deleteById(int theId) {
 
-		employeeDAO.deleteById(theId);
+		employeeRepositorySpringJpa.deleteById(theId);
 	}
 
 }
